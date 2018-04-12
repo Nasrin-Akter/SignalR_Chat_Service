@@ -1,0 +1,233 @@
+﻿<!DOCTYPE html>
+<html ng-app="myapp">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    @*<style type="text/css">
+        body {
+            position: relative;
+        }
+
+        #mainNavbar {
+            top: 20px;
+            /*position: fixed;*/
+        }
+
+        #menu li {
+            font-size: 25pt;
+            border-bottom: solid 1px #2a70d3;
+        }
+
+        #menu {
+            border-right: solid 1px #2a70d3;
+            height: 700px;
+        }
+    </style>*@
+
+</head>
+<body>
+    <input type="hidden" value="" />
+
+    <div class="navbar navbar-inverse navbar-fixed-top" style="background-color:wheat">
+        <div class="container">
+            <div class="navbar-header">
+
+                @{
+                    var r = false;
+                }
+                @if (User.Identity.IsAuthenticated)
+                {
+                    r = User.IsInRole("Admin");
+                    if (r == true)
+                    {
+                        <span class="noti glyphicon glyphicon-bell" id="bll">
+                            <span class="count"></span>
+                        </span>
+                    }
+                }
+
+                <div class="noti-content">
+                    <div class="noti-head">
+                       
+                    </div>
+                    <ul id="content">
+                     
+
+                    </ul>
+                </div>
+
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+
+    @*<div class="col-xs-3" id="menu">
+        @{
+            var p = false;
+            @if (User.Identity.IsAuthenticated)
+            {
+                p = User.IsInRole("Admin");
+                if(p==true)
+                {
+                    <nav id="mainNavbar">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="active">@Html.ActionLink</li>
+                        </ul>
+                    </nav>
+                }
+            }
+        }
+    </div>*@
+
+    <div class="container body-content" ng-controller="myctrl" >
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.3.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="/signalr/hubs"></script>
+
+    <style>
+        .noti {
+            position: fixed;
+            right: 320px;
+            color: #ff6a00;
+            margin: 15px;
+            cursor: pointer;
+        }
+
+        .noti-content {
+            position: fixed;
+            right: 200px;
+            background: #ff0000;
+            border-radius: 4px;
+            top: 47px;
+            width: 250px;
+            display: none;
+            border: 1px solid #9E9888;
+        }
+
+        .noti-head {
+            border-bottom-color: #F5E0b3;
+            background-color: transparent;
+            border-style: solid solid solid;
+            border-bottom-width: 5px;
+        }
+
+        .count {
+            font-size: 12px;
+            color: red;
+        }
+
+        #content {
+            max-height: 200px;
+            overflow: auto;
+            padding: 0px;
+            margin: 0px;
+            padding-left: 20px;
+        }
+
+        #content li {
+            margin: 3px;
+            padding: 6px;
+            background:#fff;
+            list-style: none;
+           
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            updateStudents();
+
+            $(".noti").click(function (e) {
+                e.stopPropagation();
+                $(".count", this).html('&nbsp;');
+                $(".noti-content").show();
+                $("#content").show();
+            })
+
+            $("HTML").click(function () {
+                $(".noti-content").hide();
+            })
+
+            function updateStudents() {
+                $.ajax({
+                    url: "/RequestInfoes/GetNotifications",
+                    type: "Get",
+                    dataType: "Json"
+                }).done(function (data) {
+                    console.log(data.data.length);
+                    if (data.data.length == 0) {
+                        $("#content").append("<li>No Pending Request</li>");
+                    }
+                    else {
+                        $(".count").html(data.data.length);
+                        $("#content").empty();
+                        console.log(data.data);
+                        $.each(data.data, function (i, v) {
+                            $("#content").append(" <li><a href='http://localhost:12526/RequestInfoes/Edit/" + v.ID + "' >" + v.UserName + " is Requested to add " + v.GroupName + "</a></li>");
+                            console.log(v.UserName)
+                           
+                            
+                        })
+                    }
+                }).fail(function (err) {
+                    console.log(err);
+                })
+            }
+
+            function updatecount() {
+                var c = 0;
+                //console.log("No:" + $("#content li").length);
+                c = parseInt($(".count").html()) || 0;
+                c++;
+                $(".count").html($("#content li").length);
+
+
+            }
+
+            var chat = $.connection.myHub;
+            chat.client.message = function (msg) {
+                if (msg && msg.toLowerCase() == "newrecord") {
+                    updateStudents();
+                    //    updatecount();
+                }
+            }
+            $.connection.hub.start().done(function () {
+                //  updatecount();
+                updateStudents();
+            })
+
+        });
+    </script>
+
+</body>
+</html>

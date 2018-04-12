@@ -1,0 +1,53 @@
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
+
+namespace singularProj.Models
+{
+    // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
+    public class ApplicationUser : IdentityUser
+    {
+    }
+
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    {
+        public ApplicationDbContext()
+            : base("singularProj")
+        {
+        }
+        public DbSet<Groups> Groups { get; set; }
+        public DbSet<MessageInfo> MessageInfo { get; set; }
+        public DbSet<Request> Request { get; set; }
+    }
+    public class Groups
+    {
+       
+        public int GroupID { get; set; }
+         [Key]
+        public string GroupName { get; set; }
+    }
+    public class MessageInfo
+    {
+        [Key]
+        public int ID { get; set; }
+        public string MessageText { get; set; }
+        public string Time { get; set; }
+        [ForeignKey("ApplicationUser")]
+        public string UserName{ get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
+    }
+    public class Request
+    {
+        //[Key]
+        public int ID { get; set; }
+        [ForeignKey("ApplicationUser")]
+        public string UserName { get; set; }
+        [ForeignKey("Groups")]
+        public string GroupName { get; set; }
+        public bool Approved { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
+
+        public virtual Groups Groups { get; set; }
+    }
+}

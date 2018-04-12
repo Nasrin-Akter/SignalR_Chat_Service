@@ -1,0 +1,16 @@
+﻿
+@if (User.Identity.IsAuthenticated)
+{
+    <div>
+        <div class="col-md-12">
+            <input type="text" id="msg" ng-model="messag" placeholder="message..." />
+            <button ng-click="sendchat()">Send</button>
+            <div>
+                <div class="col-md-12" style="text-align:center;margin-bottom:10px;margin-top:10px;">
+                    <input type="file" id="file" name="file" onchange="angular.element(this).scope().setFile(this)" 
+                            class="btn btn-primary" /> 
+                </div>
+            </div>
+        </div>     
+    </div>
+}
